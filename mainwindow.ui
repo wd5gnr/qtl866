@@ -155,9 +155,8 @@
     <addaction name="separator"/>
     <addaction name="separator"/>
     <addaction name="action_About"/>
+    <addaction name="action_Options"/>
     <addaction name="action_Exit"/>
-    <addaction name="separator"/>
-    <addaction name="separator"/>
    </widget>
    <addaction name="menu_File"/>
   </widget>
@@ -178,6 +177,11 @@
   <action name="action_About">
    <property name="text">
     <string>&amp;About</string>
+   </property>
+  </action>
+  <action name="action_Options">
+   <property name="text">
+    <string>&amp;Options</string>
    </property>
   </action>
  </widget>

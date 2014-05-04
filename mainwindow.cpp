@@ -21,6 +21,8 @@ qtl866 - GUI driver for minipro EPROM/Device programmer software
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QRegExp>
+#include <QFileInfo>
+#include "optdialog.h"
 #include "devices.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -68,26 +70,23 @@ void MainWindow::on_print()
 {
     QString str(slave->readAll());
     // We filter out new lines and also the ESC [K sent by the slave to adjust the cursor
-    ui->shell->append(str.remove('\r').remove('\n').remove(QRegExp("\\x001b\\[K")));
+    ui->shell->append(str.remove('\r').remove('\n').remove(QRegExp("\\x001b\\[[^A-Z]*[A-Z]")));
 
 }
 
 void MainWindow::on_exec_clicked()
 {
     unsigned int found=0,i, reading=1;
-    QString cmd="minipro";
+    QString cmd=settings->value("options/command","minipro").toString();
     QString devname, args;
+    QFileInfo *testfile;
     ui->shell->setText("");  // clear shell window
     if (ui->filename->text().isEmpty()||ui->filename->text().isNull())
     {
         QMessageBox::critical(this,tr("Error"),tr("Must enter file name!"));
         return;
     }
-    // TODO: Check file is readable for writes or  writeable for read
-    // TODO: For write to existing file, prompt for overwrite
-    // TODO: If read all, need to also prompt for fuses.conf and eeprom.conf or we could break into 3 operations maybe
-    // TODO: Could add write all and do in 3 operations
-    // TODO: detect .hex .srec etc and convert to temporary file on write
+    // TODO: detect .hex .srec etc and convert to temporary file on write (or could do this in script)
     devname=ui->device->currentText();
     for (i=0;i<sizeof(devnames)/sizeof(devnames[0]);i++)
     {
@@ -129,6 +128,38 @@ void MainWindow::on_exec_clicked()
     else
         args+=" -w ";
     args+= ui->filename->text();
+    // TODO: Check file is readable for writes or  writeable for read
+    // TODO: For write to existing file, prompt for overwrite
+    testfile=new QFileInfo(ui->filename->text());
+    if (reading)
+    {
+        if (testfile->exists())
+        {
+            // prompt for overwrite
+            if (QMessageBox::No==QMessageBox::question(this,tr("Confirm"),tr("Overwrite File?"),QMessageBox::Yes,QMessageBox::No))
+            {
+                return;
+            }
+        }
+        if (ui->readAll->isChecked())
+        {
+            if (QMessageBox::No==QMessageBox::question(this,tr("Warning"),tr("Read All also creates files eeprom.bin and fuses.txt and will overwrite any existing files. Continue?"),QMessageBox::Yes,QMessageBox::No))
+            {
+                return;
+            }
+
+        }
+
+    }
+    else
+    {
+        if (!testfile->exists())
+        {
+            QMessageBox::critical(this,tr("Error"),tr("File not found or not readable"));
+        }
+    }
+    // TODO: Could add write all and do in 3 operations
+
     ui->exec->setEnabled(false);
     ui->groupBox->setEnabled(false);
     ui->device->setEnabled(false);
@@ -174,4 +205,10 @@ void MainWindow::on_filename_textChanged(const QString &arg1)
 void MainWindow::on_useisp_stateChanged(int arg1)
 {
     settings->setValue("session/isp",ui->useisp->isChecked());
+}
+
+void MainWindow::on_action_Options_triggered()
+{
+    OptDialog *dlg=new OptDialog(this);
+    dlg->exec();
 }

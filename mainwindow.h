@@ -35,6 +35,7 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
+    QSettings *settings;
     ~MainWindow();
 
 private slots:
@@ -56,10 +57,11 @@ private slots:
 
     void on_useisp_stateChanged(int arg1);
 
+    void on_action_Options_triggered();
+
 private:
     Ui::MainWindow *ui;
     QProcess *slave;
-    QSettings *settings;
 };
 
 #endif // MAINWINDOW_H

@@ -13,11 +13,14 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    optdialog.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    optdialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    optdialog.ui
 
 OTHER_FILES += \
     README.md \
