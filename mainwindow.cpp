@@ -1,14 +1,177 @@
+/*
+qtl866 - GUI driver for minipro EPROM/Device programmer software
+    See also https://github.com/vdudouyt/minipro
+    Copyright (C) 2014  Al Williams al.williams@awce.com
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QRegExp>
+#include "devices.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    unsigned int i;
+    QString selected;
+    settings = new QSettings("com.awce","qtl866");
+    selected=settings->value("session/seldevice","PIC16F886").toString();
     ui->setupUi(this);
+    for (i=0;i<sizeof(devnames)/sizeof(devnames[0]);i++)
+        ui->device->addItem(devnames[i],devnames[i]);
+    ui->device->setCurrentIndex(ui->device->findText(selected));
+    ui->filename->setText(settings->value("session/filename","").toString());
+    ui->useisp->setChecked(settings->value("session/isp",false).toBool());
+
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::on_browse_clicked()
+{
+    ui->filename->setText(QFileDialog::getSaveFileName(this,
+       tr("Image File"), ui->filename->text(), tr("Image Files (*.bin);;Text Files (*.txt);;All Files (*)"),0,QFileDialog::DontConfirmOverwrite));
+}
+
+
+
+// Reenable interface after slave finishes
+void MainWindow::on_finished(int)
+{
+    ui->exec->setEnabled(true);
+    ui->groupBox->setEnabled(true);
+    ui->device->setEnabled(true);
+    ui->browse->setEnabled(true);
+    ui->useisp->setEnabled(true);
+}
+
+// Print stuff from slave process
+void MainWindow::on_print()
+{
+    QString str(slave->readAll());
+    // We filter out new lines and also the ESC [K sent by the slave to adjust the cursor
+    ui->shell->append(str.remove('\r').remove('\n').remove(QRegExp("\\x001b\\[K")));
+
+}
+
+void MainWindow::on_exec_clicked()
+{
+    unsigned int found=0,i, reading=1;
+    QString cmd="minipro";
+    QString devname, args;
+    ui->shell->setText("");  // clear shell window
+    if (ui->filename->text().isEmpty()||ui->filename->text().isNull())
+    {
+        QMessageBox::critical(this,tr("Error"),tr("Must enter file name!"));
+        return;
+    }
+    // TODO: Check file is readable for writes or  writeable for read
+    // TODO: For write to existing file, prompt for overwrite
+    // TODO: If read all, need to also prompt for fuses.conf and eeprom.conf or we could break into 3 operations maybe
+    // TODO: Could add write all and do in 3 operations
+    // TODO: detect .hex .srec etc and convert to temporary file on write
+    devname=ui->device->currentText();
+    for (i=0;i<sizeof(devnames)/sizeof(devnames[0]);i++)
+    {
+        if (!strcmp(devname.toStdString().c_str(),devnames[i]))
+        {
+            found=1;
+            break;
+        }
+    }
+    if (!found)
+    {
+        QMessageBox::critical(this,tr("Error"),tr("Unknown device (device names are case sensitive)."));
+        return;
+    }
+    // Build argument string
+    args="-p " + devname;
+    if (ui->useisp->isChecked()) args+= " -i";
+    if (ui->readcode->isChecked()) args+=" -c code";
+    if (ui->readdata->isChecked()) args+=" -c data";
+    if (ui->readconfig->isChecked()) args+=" -c config";
+    if (ui->writecode->isChecked())
+            {
+            args+=" -c code";
+            reading=0;
+            }
+    if (ui->writedata->isChecked())
+            {
+            args+=" -c data";
+            reading=0;
+            }
+    if (ui->writeconfig->isChecked())
+            {
+            args+=" -c config";
+            reading=0;
+            }
+
+    if (reading)
+        args+=" -r ";
+    else
+        args+=" -w ";
+    args+= ui->filename->text();
+    ui->exec->setEnabled(false);
+    ui->groupBox->setEnabled(false);
+    ui->device->setEnabled(false);
+    ui->browse->setEnabled(false);
+    ui->useisp->setEnabled(false);
+    slave=new QProcess(this);
+    connect(slave,SIGNAL(finished(int)),this,SLOT(on_finished(int)));
+    connect(slave,SIGNAL(readyReadStandardError()),this,SLOT(on_print()));
+    connect(slave,SIGNAL(readyReadStandardOutput()),this,SLOT(on_print()));
+    slave->start(cmd + " " + args);
+
+}
+
+void MainWindow::on_action_About_triggered()
+{
+    QMessageBox::information(this,tr("About"),tr("qtl866 V0.1 Copyright (c) 2014 by Al Williams http://www.awce.com.\n"
+                                                 "This program comes with ABSOLUTELY NO WARRANTY. "
+                                                 "This is free software, and you are welcome to redistribute it under certain conditions.\n"
+                                                 "See the file COPYING for more information."
+                                                 ));
+}
+
+
+// Save file name and device status
+
+
+void MainWindow::on_device_currentIndexChanged(int index)
+{
+    settings->setValue("session/seldevice",ui->device->currentText());
+}
+
+void MainWindow::on_device_currentTextChanged(const QString &arg1)
+{
+    settings->setValue("session/seldevice",ui->device->currentText());
+
+}
+
+void MainWindow::on_filename_textChanged(const QString &arg1)
+{
+    settings->setValue("session/filename",arg1);
+}
+
+void MainWindow::on_useisp_stateChanged(int arg1)
+{
+    settings->setValue("session/isp",ui->useisp->isChecked());
 }
