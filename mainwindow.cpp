@@ -50,7 +50,7 @@ MainWindow::~MainWindow()
 void MainWindow::on_browse_clicked()
 {
     ui->filename->setText(QFileDialog::getSaveFileName(this,
-       tr("Image File"), ui->filename->text(), tr("Image Files (*.bin);;Text Files (*.txt);;All Files (*)"),0,QFileDialog::DontConfirmOverwrite));
+       tr("Image File"), ui->filename->text(), tr("Binary Image Files (*.bin);;Text Files (*.txt);;Intel Hex File (*.hex);;Motorola S Record Files (*.srec);;All Files (*)"),0,QFileDialog::DontConfirmOverwrite));
 }
 
 
@@ -128,8 +128,6 @@ void MainWindow::on_exec_clicked()
     else
         args+=" -w ";
     args+= ui->filename->text();
-    // TODO: Check file is readable for writes or  writeable for read
-    // TODO: For write to existing file, prompt for overwrite
     testfile=new QFileInfo(ui->filename->text());
     if (reading)
     {
