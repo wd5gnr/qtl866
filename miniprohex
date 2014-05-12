@@ -98,12 +98,12 @@ POSTCVT=
 ;;
 hex)
 RFILE="$TMPDIR/$$.bin"
-PRECVT="srec_cat $FN --intel -o $SRECOPT $RFILE"
+PRECVT="srec_cat $FN --intel -o $SRECOPT $RFILE --binary"
 POSTCVT="srec_cat $RFILE --binary $SRECOPTS -o $FN --intel"
 ;;
 srec)
 RFILE=$TMPDIR/$$.bin
-PRECVT="srec_cat $FN --motorola -o $SRECOPT $RFILE"
+PRECVT="srec_cat $FN --motorola -o $SRECOPT $RFILE --binary"
 POSTCVT="srec_cat $RFILE --binary $SRECOPTS -o $FN --motorola"
 ;;
 txt)
