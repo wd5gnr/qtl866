@@ -62,6 +62,13 @@
          </property>
         </widget>
        </item>
+       <item row="3" column="0">
+        <widget class="QRadioButton" name="readcode">
+         <property name="text">
+          <string>Read Code</string>
+         </property>
+        </widget>
+       </item>
        <item row="4" column="0">
         <widget class="QRadioButton" name="readdata">
          <property name="text">
@@ -69,10 +76,16 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QRadioButton" name="readcode">
+       <item row="1" column="1">
+        <widget class="QCheckBox" name="erasechip">
+         <property name="toolTip">
+          <string>If checked, erase device before programming if possible</string>
+         </property>
          <property name="text">
-          <string>Read Code</string>
+          <string>Erase before write</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

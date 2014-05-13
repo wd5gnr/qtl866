@@ -103,6 +103,7 @@ void MainWindow::on_exec_clicked()
     }
     // Build argument string
     args="-p " + devname;
+    if (!ui->erasechip->isChecked()) args+=" -e";
     if (ui->useisp->isChecked()) args+= " -i";
     if (ui->readcode->isChecked()) args+=" -c code";
     if (ui->readdata->isChecked()) args+=" -c data";
@@ -173,7 +174,7 @@ void MainWindow::on_exec_clicked()
 
 void MainWindow::on_action_About_triggered()
 {
-    QMessageBox::information(this,tr("About"),tr("qtl866 V0.1 Copyright (c) 2014 by Al Williams http://www.awce.com.\n"
+    QMessageBox::information(this,tr("About"),tr("qtl866 V0.2 Copyright (c) 2014 by Al Williams http://www.awce.com.\n"
                                                  "This program comes with ABSOLUTELY NO WARRANTY. "
                                                  "This is free software, and you are welcome to redistribute it under certain conditions.\n"
                                                  "See the file COPYING for more information."
