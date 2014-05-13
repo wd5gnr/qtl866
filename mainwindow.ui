@@ -16,7 +16,11 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="3" column="1" colspan="3">
-     <widget class="QLineEdit" name="filename"/>
+     <widget class="QLineEdit" name="filename">
+      <property name="toolTip">
+       <string>Select file. Known file types for code and data are .bin, .hex, and .srec. Fuses are in .txt files.</string>
+      </property>
+     </widget>
     </item>
     <item row="2" column="0" colspan="5">
      <widget class="QGroupBox" name="groupBox">
@@ -33,6 +37,9 @@
        </item>
        <item row="1" column="0">
         <widget class="QRadioButton" name="readAll">
+         <property name="toolTip">
+          <string>Read all of device (not recommended; generates unconverted files -- see CLI help for more information)</string>
+         </property>
          <property name="text">
           <string>Read All</string>
          </property>
@@ -108,6 +115,9 @@
     </item>
     <item row="5" column="0" colspan="5">
      <widget class="QTextEdit" name="shell">
+      <property name="toolTip">
+       <string>Output from CLI tool</string>
+      </property>
       <property name="readOnly">
        <bool>true</bool>
       </property>
@@ -128,6 +138,9 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="toolTip">
+       <string>Enter or select device name (case sensitive)</string>
+      </property>
       <property name="editable">
        <bool>true</bool>
       </property>
@@ -135,6 +148,9 @@
     </item>
     <item row="0" column="4">
      <widget class="QCheckBox" name="useisp">
+      <property name="toolTip">
+       <string>Check for ISP mode</string>
+      </property>
       <property name="text">
        <string>Use ISP</string>
       </property>
@@ -142,6 +158,9 @@
     </item>
     <item row="4" column="1">
      <widget class="QPushButton" name="exec">
+      <property name="toolTip">
+       <string>Begin selected operation</string>
+      </property>
       <property name="text">
        <string>E&amp;xecute</string>
       </property>
