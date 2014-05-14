@@ -68,9 +68,13 @@ void MainWindow::on_finished(int)
 // Print stuff from slave process
 void MainWindow::on_print()
 {
-    QString str(slave->readAll());
+    QString str(slave->readAllStandardOutput());
+    QString estr(slave->readAllStandardError());
     // We filter out new lines and also the ESC [K sent by the slave to adjust the cursor
+    ui->shell->setTextColor(Qt::black);
     ui->shell->append(str.remove('\r').remove('\n').remove(QRegExp("\\x001b\\[[^A-Z]*[A-Z]")));
+    ui->shell->setTextColor(Qt::red);
+    ui->shell->append(estr.remove('\r').remove('\n').remove(QRegExp("\\x001b\\[[^A-Z]*[A-Z]")));
 
 }
 
