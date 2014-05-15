@@ -59,6 +59,8 @@ private slots:
 
     void on_action_Options_triggered();
 
+    void on_editbtn_clicked();
+
 private:
     Ui::MainWindow *ui;
     QProcess *slave;

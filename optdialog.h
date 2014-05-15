@@ -20,6 +20,8 @@ private slots:
 
     void on_buttonBox_accepted();
 
+    void on_resetbtn_clicked();
+
 private:
     Ui::OptDialog *ui;
 };

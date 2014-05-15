@@ -178,7 +178,7 @@ void MainWindow::on_exec_clicked()
 
 void MainWindow::on_action_About_triggered()
 {
-    QMessageBox::information(this,tr("About"),tr("qtl866 V0.2 Copyright (c) 2014 by Al Williams http://www.awce.com.\n"
+    QMessageBox::information(this,tr("About"),tr("qtl866 V0.3 Copyright (c) 2014 by Al Williams http://www.awce.com.\n"
                                                  "This program comes with ABSOLUTELY NO WARRANTY. "
                                                  "This is free software, and you are welcome to redistribute it under certain conditions.\n"
                                                  "See the file COPYING for more information."
@@ -214,4 +214,10 @@ void MainWindow::on_action_Options_triggered()
 {
     OptDialog *dlg=new OptDialog(this);
     dlg->exec();
+}
+
+void MainWindow::on_editbtn_clicked()
+{
+    QString cmdline=settings->value("option/editcmd","binhexedit -r").toString() +" " + ui->filename->text();
+    system(cmdline.toAscii());
 }

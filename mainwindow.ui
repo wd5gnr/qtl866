@@ -15,14 +15,7 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="3" column="1" colspan="3">
-     <widget class="QLineEdit" name="filename">
-      <property name="toolTip">
-       <string>Select file. Known file types for code and data are .bin, .hex, and .srec. Fuses are in .txt files.</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0" colspan="5">
+    <item row="2" column="0" colspan="6">
      <widget class="QGroupBox" name="groupBox">
       <property name="title">
        <string>Operation</string>
@@ -31,7 +24,7 @@
        <item row="5" column="0">
         <widget class="QRadioButton" name="readconfig">
          <property name="text">
-          <string>Read Config</string>
+          <string>Read Confi&amp;g</string>
          </property>
         </widget>
        </item>
@@ -41,7 +34,7 @@
           <string>Read all of device (not recommended; generates unconverted files -- see CLI help for more information)</string>
          </property>
          <property name="text">
-          <string>Read All</string>
+          <string>&amp;Read All</string>
          </property>
          <property name="checked">
           <bool>true</bool>
@@ -51,35 +44,35 @@
        <item row="4" column="1">
         <widget class="QRadioButton" name="writedata">
          <property name="text">
-          <string>Write Data</string>
+          <string>Write &amp;Data</string>
          </property>
         </widget>
        </item>
        <item row="3" column="1">
         <widget class="QRadioButton" name="writecode">
          <property name="text">
-          <string>Write Code</string>
+          <string>Write &amp;Code</string>
          </property>
         </widget>
        </item>
        <item row="5" column="1">
         <widget class="QRadioButton" name="writeconfig">
          <property name="text">
-          <string>Write Config</string>
+          <string>Write Co&amp;nfig</string>
          </property>
         </widget>
        </item>
        <item row="3" column="0">
         <widget class="QRadioButton" name="readcode">
          <property name="text">
-          <string>Read Code</string>
+          <string>Read C&amp;ode</string>
          </property>
         </widget>
        </item>
        <item row="4" column="0">
         <widget class="QRadioButton" name="readdata">
          <property name="text">
-          <string>Read Data</string>
+          <string>Read Da&amp;ta</string>
          </property>
         </widget>
        </item>
@@ -89,7 +82,7 @@
           <string>If checked, erase device before programming if possible</string>
          </property>
          <property name="text">
-          <string>Erase before write</string>
+          <string>Erase &amp;before write</string>
          </property>
          <property name="checked">
           <bool>true</bool>
@@ -102,18 +95,21 @@
     <item row="3" column="0">
      <widget class="QLabel" name="label_2">
       <property name="text">
-       <string>File</string>
+       <string>Fi&amp;le</string>
+      </property>
+      <property name="buddy">
+       <cstring>filename</cstring>
       </property>
      </widget>
     </item>
-    <item row="3" column="4">
+    <item row="3" column="5">
      <widget class="QPushButton" name="browse">
       <property name="text">
        <string>&amp;Browse</string>
       </property>
      </widget>
     </item>
-    <item row="5" column="0" colspan="5">
+    <item row="5" column="0" colspan="6">
      <widget class="QTextEdit" name="shell">
       <property name="toolTip">
        <string>Output from CLI tool</string>
@@ -126,11 +122,14 @@
     <item row="0" column="0">
      <widget class="QLabel" name="label">
       <property name="text">
-       <string>Device</string>
+       <string>De&amp;vice</string>
+      </property>
+      <property name="buddy">
+       <cstring>device</cstring>
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
+    <item row="0" column="2">
      <widget class="QComboBox" name="device">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -146,17 +145,17 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="4">
+    <item row="0" column="5">
      <widget class="QCheckBox" name="useisp">
       <property name="toolTip">
        <string>Check for ISP mode</string>
       </property>
       <property name="text">
-       <string>Use ISP</string>
+       <string>Use &amp;ISP</string>
       </property>
      </widget>
     </item>
-    <item row="4" column="1">
+    <item row="4" column="2">
      <widget class="QPushButton" name="exec">
       <property name="toolTip">
        <string>Begin selected operation</string>
@@ -166,6 +165,20 @@
       </property>
       <property name="default">
        <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="2" colspan="3">
+     <widget class="QLineEdit" name="filename">
+      <property name="toolTip">
+       <string>Select file. Known file types for code and data are .bin, .hex, and .srec. Fuses are in .txt files.</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="4">
+     <widget class="QPushButton" name="editbtn">
+      <property name="text">
+       <string>&amp;Edit</string>
       </property>
      </widget>
     </item>
@@ -218,6 +231,23 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>device</tabstop>
+  <tabstop>useisp</tabstop>
+  <tabstop>readAll</tabstop>
+  <tabstop>readcode</tabstop>
+  <tabstop>readdata</tabstop>
+  <tabstop>readconfig</tabstop>
+  <tabstop>erasechip</tabstop>
+  <tabstop>writecode</tabstop>
+  <tabstop>writedata</tabstop>
+  <tabstop>writeconfig</tabstop>
+  <tabstop>filename</tabstop>
+  <tabstop>browse</tabstop>
+  <tabstop>exec</tabstop>
+  <tabstop>editbtn</tabstop>
+  <tabstop>shell</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
