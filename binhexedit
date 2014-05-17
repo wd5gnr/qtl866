@@ -75,11 +75,6 @@ do
     RWOPT=-r
     shift
     FN=$1
-  elif [ "$1" == "-w" ]
-  then
-    RWOPT=-w
-    shift
-    FN=$1
   else
     OPTS="$OPTS $1"
   fi
@@ -94,7 +89,7 @@ fileprefix="${filename%.*}"
 # and what you have to do before or after
 # to get the right answer
 case "$extension" in
-.bin)
+bin)
 # no conversion needed
 RFILE="$FN"
 PRECVT=
@@ -109,6 +104,9 @@ srec)
 RFILE=$TMPDIR/$$.bin
 PRECVT="srec_cat $FN --motorola -o $SRECOPT $RFILE --binary"
 POSTCVT="srec_cat $RFILE --binary $SRECOPTS -o $FN --motorola"
+;;
+txt)  # special case
+exec ${EDITOR:-nano} "$FN"
 ;;
 *) 
 # Who knows?
