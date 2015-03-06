@@ -219,5 +219,5 @@ void MainWindow::on_action_Options_triggered()
 void MainWindow::on_editbtn_clicked()
 {
     QString cmdline=settings->value("option/editcmd","binhexedit -r").toString() +" " + ui->filename->text();
-    system(cmdline.toAscii());
+    system(cmdline.toLatin1());
 }
