@@ -82,7 +82,8 @@ void MainWindow::on_exec_clicked()
 {
     unsigned int found=0,i, reading=1;
     QString cmd=settings->value("options/command","minipro").toString();
-    QString devname, args;
+    QString devname;
+    QStringList args;
     QFileInfo *testfile;
     ui->shell->setText("");  // clear shell window
     if (ui->filename->text().isEmpty()||ui->filename->text().isNull())
@@ -106,7 +107,8 @@ void MainWindow::on_exec_clicked()
         return;
     }
     // Build argument string
-    args="-p " + devname;
+    args<<"-p";
+    args<<devname;
     if (!ui->erasechip->isChecked()) args+=" -e";
     if (ui->useisp->isChecked()) args+= " -i";
     if (ui->readcode->isChecked()) args+=" -c code";
@@ -172,7 +174,7 @@ void MainWindow::on_exec_clicked()
     connect(slave,SIGNAL(finished(int)),this,SLOT(on_finished(int)));
     connect(slave,SIGNAL(readyReadStandardError()),this,SLOT(on_print()));
     connect(slave,SIGNAL(readyReadStandardOutput()),this,SLOT(on_print()));
-    slave->start(cmd + " " + args);
+    slave->start(cmd,args);
 
 }
 
@@ -219,5 +221,5 @@ void MainWindow::on_action_Options_triggered()
 void MainWindow::on_editbtn_clicked()
 {
     QString cmdline=settings->value("option/editcmd","binhexedit -r").toString() +" " + ui->filename->text();
-    system(cmdline.toAscii());
+    system(cmdline.toLatin1());
 }

@@ -1,4 +1,5 @@
 #!/bin/bash
+
 if [ $# == 0 ]
 then
    cat << EOF
@@ -30,10 +31,8 @@ RWOPT=
 FN=
 # Extension provided
 EXT=
-# Options for srec_copy
+# Options for srec_cat
 SRECOPTS=
-# Place to put stuff
-TMPDIR=/tmp
 
 # parse arguments and sort them out
 while [ $# != 0 ]
@@ -76,7 +75,13 @@ do
     RWOPT=-w
     shift
     FN=$1
+  elif [ "$1" == "-p" ]
+  then
+      DEV=$2
+      shift
+      shift
   else
+echo 
     OPTS="$OPTS $1"
   fi
   shift
@@ -97,12 +102,12 @@ PRECVT=
 POSTCVT=
 ;;
 hex)
-RFILE="$TMPDIR/$$.bin"
+RFILE="$(mktemp)"
 PRECVT="srec_cat $FN --intel -o $SRECOPT $RFILE --binary"
 POSTCVT="srec_cat $RFILE --binary $SRECOPTS -o $FN --intel"
 ;;
 srec)
-RFILE=$TMPDIR/$$.bin
+RFILE="$(mktemp)"
 PRECVT="srec_cat $FN --motorola -o $SRECOPT $RFILE --binary"
 POSTCVT="srec_cat $RFILE --binary $SRECOPTS -o $FN --motorola"
 ;;
@@ -119,16 +124,15 @@ PRECVT=
 POSTCVT=
 esac
 # If we write, do PRECMD and execute
-if [ $RWOPT == -w ]
+if [ "$RWOPT" == -w ]
 then
 $PRECVT
-minipro $OPTS $RWOPT $RFILE
+minipro $OPTS -p "$DEV" $RWOPT $RFILE
 else
 # If reading, execute and then do post cmd
-minipro $OPTS $RWOPT $RFILE
+minipro $OPTS -p "$DEV" $RWOPT $RFILE
 $POSTCVT
 fi
 
-
-
-
+# Purge the temporary file if we used one
+[ "$PRECVT" ] && rm "$RFILE"
