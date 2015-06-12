@@ -56,6 +56,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->filename->setText(settings.value("session/filename","").toString());
     ui->useisp->setChecked(settings.value("session/isp",false).toBool());
     ui->ignoreid->setChecked(settings.value("session/ignoreid", false).toBool());
+
+    QAbstractButton *mode = ui->mode->findChild<QAbstractButton*>(settings.value("session/mode", "readAll").toString());
+    if(mode) {
+        mode->setChecked(true);
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -65,6 +70,20 @@ void MainWindow::closeEvent(QCloseEvent *event)
     settings.setValue("session/filename", ui->filename->text());
     settings.setValue("session/isp", ui->useisp->isChecked());
     settings.setValue("session/ignoreid", ui->ignoreid->isChecked());
+
+
+    QStringList modeWidgets;
+    modeWidgets << "readcode" << "readdata" << "readconfig"
+                << "writecode" << "writedata" << "writeconfig"
+                << "readAll";
+
+    for(QStringList::const_iterator it = modeWidgets.begin(); it != modeWidgets.end(); ++it) {
+        QAbstractButton *widget = ui->mode->findChild<QAbstractButton*>(*it);
+        if(widget->isChecked()) {
+            settings.setValue("session/mode", *it);
+            break;
+        }
+    }
 
     QMainWindow::closeEvent(event);
 }
@@ -82,7 +101,7 @@ void MainWindow::on_finished(int code)
 {
     qDebug() << "minipro exited with code" << code;
     ui->exec->setEnabled(true);
-    ui->groupBox->setEnabled(true);
+    ui->mode->setEnabled(true);
     ui->device->setEnabled(true);
     ui->browse->setEnabled(true);
     ui->useisp->setEnabled(true);
@@ -199,7 +218,7 @@ void MainWindow::on_exec_clicked()
     // TODO: Could add write all and do in 3 operations
 
     ui->exec->setEnabled(false);
-    ui->groupBox->setEnabled(false);
+    ui->mode->setEnabled(false);
     ui->device->setEnabled(false);
     ui->browse->setEnabled(false);
     ui->useisp->setEnabled(false);

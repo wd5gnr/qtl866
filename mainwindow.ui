@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="2" column="0" colspan="6">
-     <widget class="QGroupBox" name="groupBox">
+     <widget class="QGroupBox" name="mode">
       <property name="title">
        <string>Operation</string>
       </property>
