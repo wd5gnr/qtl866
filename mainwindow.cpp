@@ -42,11 +42,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 }
 
-MainWindow::~MainWindow()
-{
-    delete ui;
-}
-
 void MainWindow::on_browse_clicked()
 {
     ui->filename->setText(QFileDialog::getSaveFileName(this,
