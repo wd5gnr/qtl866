@@ -182,6 +182,16 @@
       </property>
      </widget>
     </item>
+    <item row="0" column="4">
+     <widget class="QCheckBox" name="ignoreid">
+      <property name="toolTip">
+       <string>Ignore chip ID mismatch and proceed anyway</string>
+      </property>
+      <property name="text">
+       <string>Ignore ID</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -190,7 +200,7 @@
      <x>0</x>
      <y>0</y>
      <width>538</width>
-     <height>27</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">

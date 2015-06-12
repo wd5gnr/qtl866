@@ -120,6 +120,7 @@ void MainWindow::on_exec_clicked()
     // Build argument string
     args << "-p";
     args << devname;
+    if (ui->ignoreid->isChecked()) args << "-y";
     if (!ui->erasechip->isChecked()) args << "-e";
     if (ui->useisp->isChecked()) args << "-i";
 
