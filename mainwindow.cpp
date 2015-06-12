@@ -22,6 +22,7 @@ qtl866 - GUI driver for minipro EPROM/Device programmer software
 #include <QMessageBox>
 #include <QRegExp>
 #include <QFileInfo>
+#include <QDebug>
 #include "optdialog.h"
 #include "devices.h"
 
@@ -71,6 +72,17 @@ void MainWindow::on_print()
     ui->shell->setTextColor(Qt::red);
     ui->shell->append(estr.remove('\r').remove('\n').remove(QRegExp("\\x001b\\[[^A-Z]*[A-Z]")));
 
+}
+
+void MainWindow::on_process_error(QProcess::ProcessError)
+{
+    QProcess *process = qobject_cast<QProcess*>(sender());
+    QMessageBox error(this);
+    error.setIcon(QMessageBox::Critical);
+    error.setWindowTitle("Could not start minipro");
+    error.setText(QStringLiteral("Could not start minipro: %1").arg(process->errorString()));
+    error.exec();
+    on_finished(-1);
 }
 
 void MainWindow::on_exec_clicked()
@@ -168,10 +180,12 @@ void MainWindow::on_exec_clicked()
     ui->useisp->setEnabled(false);
     slave=new QProcess(this);
     connect(slave,SIGNAL(finished(int)),this,SLOT(on_finished(int)));
+    connect(slave, SIGNAL(error(QProcess::ProcessError)),this,SLOT(on_process_error(QProcess::ProcessError)));
     connect(slave,SIGNAL(readyReadStandardError()),this,SLOT(on_print()));
     connect(slave,SIGNAL(readyReadStandardOutput()),this,SLOT(on_print()));
-    slave->start(cmd,args);
 
+    qDebug() << "Executing" << cmd << args;
+    slave->start(cmd,args);
 }
 
 void MainWindow::on_action_About_triggered()
