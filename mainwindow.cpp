@@ -36,7 +36,6 @@ QString getColoredText(QString color, QString text)
     return QStringLiteral("<span style='color: %1;'>%2</span>").arg(
                 color,
                 text
-                    .replace(QRegExp("\\x001b\\[[^A-Z]*[A-Z]"), "\n")
                     .toHtmlEscaped()
                     .replace("\n", "<br/>"));
 }
@@ -108,9 +107,11 @@ void MainWindow::on_finished(int code)
 
 void MainWindow::shellAppend(QString color, QString text)
 {
+    text = text.replace(QRegExp("\\x001b\\[[^A-Z]*[A-Z]"), "\n");
     QTextCursor cursor = ui->shell->document()->rootFrame()->lastCursorPosition();
     cursor.insertHtml(getColoredText(color, text));
     ui->shell->setTextCursor(cursor);
+    statusBar()->showMessage(text.split('\n').last());
 }
 
 void MainWindow::on_process_stderr()
