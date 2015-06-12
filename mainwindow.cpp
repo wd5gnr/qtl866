@@ -122,11 +122,15 @@ void MainWindow::on_exec_clicked()
     args << devname;
     if (!ui->erasechip->isChecked()) args << "-e";
     if (ui->useisp->isChecked()) args << "-i";
-    if (ui->readcode->isChecked() || ui->writecode->isChecked()) args << "-c code";
-    if (ui->readdata->isChecked() || ui->writedata->isChecked()) args << "-c data";
-    if (ui->readconfig->isChecked() || ui->writeconfig->isChecked()) args << "-c config";
+
+    if (!ui->readAll->isChecked()) {
+        args << "-c";
+        if (ui->readcode->isChecked() || ui->writecode->isChecked()) args << "code";
+        if (ui->readdata->isChecked() || ui->writedata->isChecked()) args << "data";
+        if (ui->readconfig->isChecked() || ui->writeconfig->isChecked()) args << "config";
+    }
     if (ui->writecode->isChecked() || ui->writedata->isChecked() || ui->writeconfig->isChecked())
-            reading=false;
+        reading=false;
 
     if (reading)
         args << "-r";
@@ -170,7 +174,7 @@ void MainWindow::on_exec_clicked()
     ui->useisp->setEnabled(false);
     slave=new QProcess(this);
     connect(slave,SIGNAL(finished(int)),this,SLOT(on_finished(int)));
-    connect(slave, SIGNAL(error(QProcess::ProcessError)),this,SLOT(on_process_error(QProcess::ProcessError)));
+    connect(slave, SIGNAL(error(QProcess::ProcessError)), this, SLOT(on_process_error(QProcess::ProcessError)));
     connect(slave,SIGNAL(readyReadStandardError()),this,SLOT(on_print()));
     connect(slave,SIGNAL(readyReadStandardOutput()),this,SLOT(on_print()));
 
