@@ -26,6 +26,21 @@ qtl866 - GUI driver for minipro EPROM/Device programmer software
 #include "optdialog.h"
 #include "devices.h"
 
+#include <QTextCursor>
+#include <QTextDocument>
+#include <QTextFrame>
+
+static
+QString getColoredText(QString color, QString text)
+{
+    return QStringLiteral("<span style='color: %1;'>%2</span>").arg(
+                color,
+                text
+                    .replace(QRegExp("\\x001b\\[[^A-Z]*[A-Z]"), "\n")
+                    .toHtmlEscaped()
+                    .replace("\n", "<br/>"));
+}
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -73,17 +88,21 @@ void MainWindow::on_finished(int code)
     ui->useisp->setEnabled(true);
 }
 
-// Print stuff from slave process
-void MainWindow::on_print()
+void MainWindow::shellAppend(QString color, QString text)
 {
-    QString str(slave->readAllStandardOutput());
-    QString estr(slave->readAllStandardError());
-    // We filter out new lines and also the ESC [K sent by the slave to adjust the cursor
-    ui->shell->setTextColor(Qt::black);
-    ui->shell->append(str.remove('\r').remove('\n').remove(QRegExp("\\x001b\\[[^A-Z]*[A-Z]")));
-    ui->shell->setTextColor(Qt::red);
-    ui->shell->append(estr.remove('\r').remove('\n').remove(QRegExp("\\x001b\\[[^A-Z]*[A-Z]")));
+    QTextCursor cursor = ui->shell->document()->rootFrame()->lastCursorPosition();
+    cursor.insertHtml(getColoredText(color, text));
+    ui->shell->setTextCursor(cursor);
+}
 
+void MainWindow::on_process_stderr()
+{
+    shellAppend("red", slave->readAllStandardError());
+}
+
+void MainWindow::on_process_stdout()
+{
+    shellAppend("black", slave->readAllStandardOutput());
 }
 
 void MainWindow::on_process_error(QProcess::ProcessError)
@@ -187,11 +206,11 @@ void MainWindow::on_exec_clicked()
     slave=new QProcess(this);
     connect(slave,SIGNAL(finished(int)),this,SLOT(on_finished(int)));
     connect(slave, SIGNAL(error(QProcess::ProcessError)), this, SLOT(on_process_error(QProcess::ProcessError)));
-    connect(slave,SIGNAL(readyReadStandardError()),this,SLOT(on_print()));
-    connect(slave,SIGNAL(readyReadStandardOutput()),this,SLOT(on_print()));
+    connect(slave, SIGNAL(readyReadStandardOutput()), this, SLOT(on_process_stdout()));
+    connect(slave, SIGNAL(readyReadStandardError()), this, SLOT(on_process_stderr()));
 
     qDebug() << "Executing" << cmd << args;
-    slave->start(cmd,args);
+    slave->start(cmd, args, QProcess::ReadWrite|QProcess::Unbuffered);
 }
 
 void MainWindow::on_action_About_triggered()

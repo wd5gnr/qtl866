@@ -43,7 +43,8 @@ private slots:
 
     void on_process_error(QProcess::ProcessError);
     void on_finished(int code);
-    void on_print();
+    void on_process_stdout();
+    void on_process_stderr();
 
     void on_action_About_triggered();
 
@@ -55,6 +56,8 @@ protected:
     virtual void closeEvent(QCloseEvent *event);
 
 private:
+    void shellAppend(QString color, QString text);
+
     Ui::MainWindow *ui;
     QProcess *slave;
 };
