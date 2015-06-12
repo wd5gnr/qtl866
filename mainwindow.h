@@ -45,20 +45,14 @@ private slots:
     void on_finished(int code);
     void on_print();
 
-
     void on_action_About_triggered();
-
-    void on_device_currentIndexChanged(int index);
-
-    void on_device_currentTextChanged(const QString &arg1);
-
-    void on_filename_textChanged(const QString &arg1);
-
-    void on_useisp_stateChanged(int arg1);
 
     void on_action_Options_triggered();
 
     void on_editbtn_clicked();
+
+protected:
+    virtual void closeEvent(QCloseEvent *event);
 
 private:
     Ui::MainWindow *ui;

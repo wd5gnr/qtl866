@@ -40,7 +40,18 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->device->setCurrentIndex(ui->device->findText(selected));
     ui->filename->setText(settings.value("session/filename","").toString());
     ui->useisp->setChecked(settings.value("session/isp",false).toBool());
+    ui->ignoreid->setChecked(settings.value("session/ignoreid", false).toBool());
+}
 
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    QSettings settings;
+    settings.setValue("session/seldevice", ui->device->currentText());
+    settings.setValue("session/filename", ui->filename->text());
+    settings.setValue("session/isp", ui->useisp->isChecked());
+    settings.setValue("session/ignoreid", ui->ignoreid->isChecked());
+
+    QMainWindow::closeEvent(event);
 }
 
 void MainWindow::on_browse_clicked()
@@ -190,34 +201,6 @@ void MainWindow::on_action_About_triggered()
                                                  "This is free software, and you are welcome to redistribute it under certain conditions.\n"
                                                  "See the file COPYING for more information."
                                                  ));
-}
-
-
-// Save file name and device status
-
-
-void MainWindow::on_device_currentIndexChanged(int)
-{
-    QSettings settings;
-    settings.setValue("session/seldevice",ui->device->currentText());
-}
-
-void MainWindow::on_device_currentTextChanged(const QString &)
-{
-    QSettings settings;
-    settings.setValue("session/seldevice",ui->device->currentText());
-}
-
-void MainWindow::on_filename_textChanged(const QString &arg1)
-{
-    QSettings settings;
-    settings.setValue("session/filename",arg1);
-}
-
-void MainWindow::on_useisp_stateChanged(int)
-{
-    QSettings settings;
-    settings.setValue("session/isp",ui->useisp->isChecked());
 }
 
 void MainWindow::on_action_Options_triggered()
