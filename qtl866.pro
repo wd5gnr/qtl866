@@ -17,7 +17,8 @@ SOURCES += main.cpp\
     optdialog.cpp
 
 HEADERS  += mainwindow.h \
-    optdialog.h
+    optdialog.h \
+    devices.h
 
 FORMS    += mainwindow.ui \
     optdialog.ui
