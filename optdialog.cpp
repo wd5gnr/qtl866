@@ -2,8 +2,8 @@
 #include "ui_optdialog.h"
 #include "mainwindow.h"
 
-static char defpgm[]="minipro";
-static char defed[]="binhexedit -r";
+static const char *defpgm = "minipro";
+static const char *defed = "binhexedit -r";
 
 OptDialog::OptDialog(QWidget *parent) :
     QDialog(parent),
