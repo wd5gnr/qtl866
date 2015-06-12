@@ -88,7 +88,9 @@ void MainWindow::on_process_error(QProcess::ProcessError)
 
 void MainWindow::on_exec_clicked()
 {
-    unsigned int found=0,i, reading=1;
+    unsigned int i;
+    bool found=false;
+    bool reading=true;
     QSettings settings;
     QString cmd=settings.value("options/command","minipro").toString();
     QString devname;
@@ -106,7 +108,7 @@ void MainWindow::on_exec_clicked()
     {
         if (!strcmp(devname.toStdString().c_str(),devnames[i]))
         {
-            found=1;
+            found=true;
             break;
         }
     }
@@ -116,34 +118,21 @@ void MainWindow::on_exec_clicked()
         return;
     }
     // Build argument string
-    args<<"-p";
-    args<<devname;
-    if (!ui->erasechip->isChecked()) args+=" -e";
-    if (ui->useisp->isChecked()) args+= " -i";
-    if (ui->readcode->isChecked()) args+=" -c code";
-    if (ui->readdata->isChecked()) args+=" -c data";
-    if (ui->readconfig->isChecked()) args+=" -c config";
-    if (ui->writecode->isChecked())
-            {
-            args+=" -c code";
-            reading=0;
-            }
-    if (ui->writedata->isChecked())
-            {
-            args+=" -c data";
-            reading=0;
-            }
-    if (ui->writeconfig->isChecked())
-            {
-            args+=" -c config";
-            reading=0;
-            }
+    args << "-p";
+    args << devname;
+    if (!ui->erasechip->isChecked()) args << "-e";
+    if (ui->useisp->isChecked()) args << "-i";
+    if (ui->readcode->isChecked() || ui->writecode->isChecked()) args << "-c code";
+    if (ui->readdata->isChecked() || ui->writedata->isChecked()) args << "-c data";
+    if (ui->readconfig->isChecked() || ui->writeconfig->isChecked()) args << "-c config";
+    if (ui->writecode->isChecked() || ui->writedata->isChecked() || ui->writeconfig->isChecked())
+            reading=false;
 
     if (reading)
-        args+=" -r ";
+        args << "-r";
     else
-        args+=" -w ";
-    args+= ui->filename->text();
+        args << "-w";
+    args << ui->filename->text();
     testfile=new QFileInfo(ui->filename->text());
     if (reading)
     {

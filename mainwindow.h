@@ -41,7 +41,8 @@ private slots:
 
     void on_exec_clicked();
 
-    void on_finished(int);
+    void on_process_error(QProcess::ProcessError);
+    void on_finished(int code);
     void on_print();
 
 
