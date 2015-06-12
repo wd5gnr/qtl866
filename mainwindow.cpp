@@ -52,8 +52,9 @@ void MainWindow::on_browse_clicked()
 
 
 // Reenable interface after slave finishes
-void MainWindow::on_finished(int)
+void MainWindow::on_finished(int code)
 {
+    qDebug() << "minipro exited with code" << code;
     ui->exec->setEnabled(true);
     ui->groupBox->setEnabled(true);
     ui->device->setEnabled(true);
