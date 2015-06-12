@@ -22,6 +22,10 @@ qtl866 - GUI driver for minipro EPROM/Device programmer software
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    a.setApplicationName("qtl866");
+    a.setOrganizationDomain("com.awce");
+
     MainWindow w;
     w.show();
 

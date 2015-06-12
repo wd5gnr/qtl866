@@ -31,14 +31,14 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     unsigned int i;
     QString selected;
-    settings = new QSettings("com.awce","qtl866");
-    selected=settings->value("session/seldevice","PIC16F886").toString();
+    QSettings settings;
+    selected=settings.value("session/seldevice","PIC16F886").toString();
     ui->setupUi(this);
     for (i=0;i<sizeof(devnames)/sizeof(devnames[0]);i++)
         ui->device->addItem(devnames[i],devnames[i]);
     ui->device->setCurrentIndex(ui->device->findText(selected));
-    ui->filename->setText(settings->value("session/filename","").toString());
-    ui->useisp->setChecked(settings->value("session/isp",false).toBool());
+    ui->filename->setText(settings.value("session/filename","").toString());
+    ui->useisp->setChecked(settings.value("session/isp",false).toBool());
 
 }
 
@@ -76,7 +76,8 @@ void MainWindow::on_print()
 void MainWindow::on_exec_clicked()
 {
     unsigned int found=0,i, reading=1;
-    QString cmd=settings->value("options/command","minipro").toString();
+    QSettings settings;
+    QString cmd=settings.value("options/command","minipro").toString();
     QString devname;
     QStringList args;
     QFileInfo *testfile;
@@ -186,25 +187,28 @@ void MainWindow::on_action_About_triggered()
 // Save file name and device status
 
 
-void MainWindow::on_device_currentIndexChanged(int index)
+void MainWindow::on_device_currentIndexChanged(int)
 {
-    settings->setValue("session/seldevice",ui->device->currentText());
+    QSettings settings;
+    settings.setValue("session/seldevice",ui->device->currentText());
 }
 
-void MainWindow::on_device_currentTextChanged(const QString &arg1)
+void MainWindow::on_device_currentTextChanged(const QString &)
 {
-    settings->setValue("session/seldevice",ui->device->currentText());
-
+    QSettings settings;
+    settings.setValue("session/seldevice",ui->device->currentText());
 }
 
 void MainWindow::on_filename_textChanged(const QString &arg1)
 {
-    settings->setValue("session/filename",arg1);
+    QSettings settings;
+    settings.setValue("session/filename",arg1);
 }
 
-void MainWindow::on_useisp_stateChanged(int arg1)
+void MainWindow::on_useisp_stateChanged(int)
 {
-    settings->setValue("session/isp",ui->useisp->isChecked());
+    QSettings settings;
+    settings.setValue("session/isp",ui->useisp->isChecked());
 }
 
 void MainWindow::on_action_Options_triggered()
@@ -215,6 +219,7 @@ void MainWindow::on_action_Options_triggered()
 
 void MainWindow::on_editbtn_clicked()
 {
-    QString cmdline=settings->value("option/editcmd","binhexedit -r").toString() +" " + ui->filename->text();
+    QSettings settings;
+    QString cmdline=settings.value("option/editcmd","binhexedit -r").toString() +" " + ui->filename->text();
     system(cmdline.toLatin1());
 }
