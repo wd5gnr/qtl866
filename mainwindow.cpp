@@ -99,12 +99,11 @@ void MainWindow::on_browse_clicked()
 // Reenable interface after slave finishes
 void MainWindow::on_finished(int code)
 {
+    QString color = code ? "red" : "black";
+    shellAppend(color, tr("\n\nminipro exited with code %1").arg(code));
     qDebug() << "minipro exited with code" << code;
-    ui->exec->setEnabled(true);
-    ui->mode->setEnabled(true);
-    ui->device->setEnabled(true);
-    ui->browse->setEnabled(true);
-    ui->useisp->setEnabled(true);
+
+    ui->controls->setEnabled(true);
 }
 
 void MainWindow::shellAppend(QString color, QString text)
@@ -217,11 +216,8 @@ void MainWindow::on_exec_clicked()
     }
     // TODO: Could add write all and do in 3 operations
 
-    ui->exec->setEnabled(false);
-    ui->mode->setEnabled(false);
-    ui->device->setEnabled(false);
-    ui->browse->setEnabled(false);
-    ui->useisp->setEnabled(false);
+
+    ui->controls->setEnabled(false);
     slave=new QProcess(this);
     connect(slave,SIGNAL(finished(int)),this,SLOT(on_finished(int)));
     connect(slave, SIGNAL(error(QProcess::ProcessError)), this, SLOT(on_process_error(QProcess::ProcessError)));
