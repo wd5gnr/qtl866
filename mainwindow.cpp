@@ -87,6 +87,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QMainWindow::closeEvent(event);
 }
 
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
 void MainWindow::on_browse_clicked()
 {
     ui->filename->setText(QFileDialog::getSaveFileName(this,
