@@ -29,6 +29,7 @@ qtl866 - GUI driver for minipro EPROM/Device programmer software
 #include <QTextCursor>
 #include <QTextDocument>
 #include <QTextFrame>
+#include <QCompleter>
 
 static
 QString getColoredText(QString color, QString text)
@@ -51,7 +52,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     for (i=0;i<sizeof(devnames)/sizeof(devnames[0]);i++)
         ui->device->addItem(devnames[i],devnames[i]);
-    ui->device->setCurrentIndex(ui->device->findText(selected));
+    ui->device->setCurrentText(selected);
     ui->filename->setText(settings.value("session/filename","").toString());
     ui->useisp->setChecked(settings.value("session/isp",false).toBool());
     ui->ignoreid->setChecked(settings.value("session/ignoreid", false).toBool());
@@ -60,6 +61,10 @@ MainWindow::MainWindow(QWidget *parent) :
     if(mode) {
         mode->setChecked(true);
     }
+
+    QCompleter *completer = ui->device->completer();
+    completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+    completer->setFilterMode(Qt::MatchContains);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
