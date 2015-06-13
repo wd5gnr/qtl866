@@ -148,7 +148,8 @@ void MainWindow::on_exec_clicked()
     ui->shell->setText("");  // clear shell window
     if (ui->filename->text().isEmpty()||ui->filename->text().isNull())
     {
-        QMessageBox::critical(this,tr("Error"),tr("Must enter file name!"));
+        on_browse_clicked();
+        emit ui->exec->clicked(); // avoid stack overflow with patient users
         return;
     }
     // TODO: detect .hex .srec etc and convert to temporary file on write (or could do this in script)
