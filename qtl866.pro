@@ -11,7 +11,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = qtl866
 TEMPLATE = app
 
-
 SOURCES += main.cpp\
         mainwindow.cpp \
     optdialog.cpp
@@ -26,3 +25,6 @@ FORMS    += mainwindow.ui \
 OTHER_FILES += \
     README.md \
     COPYING
+
+target.path = /usr/bin/
+INSTALLS += target
