@@ -13,14 +13,13 @@ class OptDialog : public QDialog
 
 public:
     explicit OptDialog(QWidget *parent = 0);
-    ~OptDialog();
+    virtual ~OptDialog();
+
+protected:
+    virtual void closeEvent(QCloseEvent *event);
 
 private slots:
-    void on_OptDialog_accepted();
-
-    void on_buttonBox_accepted();
-
-    void on_resetbtn_clicked();
+    void restoreDefaults();
 
 private:
     Ui::OptDialog *ui;

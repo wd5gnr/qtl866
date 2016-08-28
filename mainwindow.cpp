@@ -22,8 +22,24 @@ qtl866 - GUI driver for minipro EPROM/Device programmer software
 #include <QMessageBox>
 #include <QRegExp>
 #include <QFileInfo>
+#include <QDebug>
 #include "optdialog.h"
 #include "devices.h"
+
+#include <QTextCursor>
+#include <QTextDocument>
+#include <QTextFrame>
+#include <QCompleter>
+
+static
+QString getColoredText(QString color, QString text)
+{
+    return QStringLiteral("<span style='color: %1;'>%2</span>").arg(
+                color,
+                text
+                    .toHtmlEscaped()
+                    .replace("\n", "<br/>"));
+}
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -31,15 +47,49 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     unsigned int i;
     QString selected;
-    settings = new QSettings("com.awce","qtl866");
-    selected=settings->value("session/seldevice","PIC16F886").toString();
+    QSettings settings;
+    selected=settings.value("session/seldevice","PIC16F886").toString();
     ui->setupUi(this);
     for (i=0;i<sizeof(devnames)/sizeof(devnames[0]);i++)
         ui->device->addItem(devnames[i],devnames[i]);
-    ui->device->setCurrentIndex(ui->device->findText(selected));
-    ui->filename->setText(settings->value("session/filename","").toString());
-    ui->useisp->setChecked(settings->value("session/isp",false).toBool());
+    ui->device->setCurrentText(selected);
+    ui->filename->setText(settings.value("session/filename","").toString());
+    ui->useisp->setChecked(settings.value("session/isp",false).toBool());
+    ui->ignoreid->setChecked(settings.value("session/ignoreid", false).toBool());
 
+    QAbstractButton *mode = ui->mode->findChild<QAbstractButton*>(settings.value("session/mode", "readAll").toString());
+    if(mode) {
+        mode->setChecked(true);
+    }
+
+    QCompleter *completer = ui->device->completer();
+    completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+    completer->setFilterMode(Qt::MatchContains);
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    QSettings settings;
+    settings.setValue("session/seldevice", ui->device->currentText());
+    settings.setValue("session/filename", ui->filename->text());
+    settings.setValue("session/isp", ui->useisp->isChecked());
+    settings.setValue("session/ignoreid", ui->ignoreid->isChecked());
+
+
+    QStringList modeWidgets;
+    modeWidgets << "readcode" << "readdata" << "readconfig"
+                << "writecode" << "writedata" << "writeconfig"
+                << "readAll";
+
+    for(QStringList::const_iterator it = modeWidgets.begin(); it != modeWidgets.end(); ++it) {
+        QAbstractButton *widget = ui->mode->findChild<QAbstractButton*>(*it);
+        if(widget->isChecked()) {
+            settings.setValue("session/mode", *it);
+            break;
+        }
+    }
+
+    QMainWindow::closeEvent(event);
 }
 
 MainWindow::~MainWindow()
@@ -56,39 +106,60 @@ void MainWindow::on_browse_clicked()
 
 
 // Reenable interface after slave finishes
-void MainWindow::on_finished(int)
+void MainWindow::on_finished(int code)
 {
-    ui->exec->setEnabled(true);
-    ui->groupBox->setEnabled(true);
-    ui->device->setEnabled(true);
-    ui->browse->setEnabled(true);
-    ui->useisp->setEnabled(true);
+    QString color = code ? "red" : "black";
+    shellAppend(color, tr("\n\nminipro exited with code %1").arg(code));
+    qDebug() << "minipro exited with code" << code;
+
+    ui->controls->setEnabled(true);
 }
 
-// Print stuff from slave process
-void MainWindow::on_print()
+void MainWindow::shellAppend(QString color, QString text)
 {
-    QString str(slave->readAllStandardOutput());
-    QString estr(slave->readAllStandardError());
-    // We filter out new lines and also the ESC [K sent by the slave to adjust the cursor
-    ui->shell->setTextColor(Qt::black);
-    ui->shell->append(str.remove('\r').remove('\n').remove(QRegExp("\\x001b\\[[^A-Z]*[A-Z]")));
-    ui->shell->setTextColor(Qt::red);
-    ui->shell->append(estr.remove('\r').remove('\n').remove(QRegExp("\\x001b\\[[^A-Z]*[A-Z]")));
+    text = text.replace(QRegExp("\\x001b\\[[^A-Z]*[A-Z]"), "\n");
+    QTextCursor cursor = ui->shell->document()->rootFrame()->lastCursorPosition();
+    cursor.insertHtml(getColoredText(color, text));
+    ui->shell->setTextCursor(cursor);
+    statusBar()->showMessage(text.split('\n').last());
+}
 
+void MainWindow::on_process_stderr()
+{
+    shellAppend("red", slave->readAllStandardError());
+}
+
+void MainWindow::on_process_stdout()
+{
+    shellAppend("black", slave->readAllStandardOutput());
+}
+
+void MainWindow::on_process_error(QProcess::ProcessError)
+{
+    QProcess *process = qobject_cast<QProcess*>(sender());
+    QMessageBox error(this);
+    error.setIcon(QMessageBox::Critical);
+    error.setWindowTitle("Could not start minipro");
+    error.setText(QStringLiteral("Could not start minipro: %1").arg(process->errorString()));
+    error.exec();
+    on_finished(-1);
 }
 
 void MainWindow::on_exec_clicked()
 {
-    unsigned int found=0,i, reading=1;
-    QString cmd=settings->value("options/command","minipro").toString();
+    unsigned int i;
+    bool found=false;
+    bool reading=true;
+    QSettings settings;
+    QString cmd=settings.value("options/command","minipro").toString();
     QString devname;
     QStringList args;
     QFileInfo *testfile;
     ui->shell->setText("");  // clear shell window
     if (ui->filename->text().isEmpty()||ui->filename->text().isNull())
     {
-        QMessageBox::critical(this,tr("Error"),tr("Must enter file name!"));
+        on_browse_clicked();
+        emit ui->exec->clicked(); // avoid stack overflow with patient users
         return;
     }
     // TODO: detect .hex .srec etc and convert to temporary file on write (or could do this in script)
@@ -97,7 +168,7 @@ void MainWindow::on_exec_clicked()
     {
         if (!strcmp(devname.toStdString().c_str(),devnames[i]))
         {
-            found=1;
+            found=true;
             break;
         }
     }
@@ -107,34 +178,26 @@ void MainWindow::on_exec_clicked()
         return;
     }
     // Build argument string
-    args<<"-p";
-    args<<devname;
-    if (!ui->erasechip->isChecked()) args+=" -e";
-    if (ui->useisp->isChecked()) args+= " -i";
-    if (ui->readcode->isChecked()) args+=" -c code";
-    if (ui->readdata->isChecked()) args+=" -c data";
-    if (ui->readconfig->isChecked()) args+=" -c config";
-    if (ui->writecode->isChecked())
-            {
-            args+=" -c code";
-            reading=0;
-            }
-    if (ui->writedata->isChecked())
-            {
-            args+=" -c data";
-            reading=0;
-            }
-    if (ui->writeconfig->isChecked())
-            {
-            args+=" -c config";
-            reading=0;
-            }
+    args << "-p";
+    args << devname;
+    if (ui->ignoreid->isChecked()) args << "-y";
+    if (!ui->erasechip->isChecked()) args << "-e";
+    if (ui->useisp->isChecked()) args << "-i";
+
+    if (!ui->readAll->isChecked()) {
+        args << "-c";
+        if (ui->readcode->isChecked() || ui->writecode->isChecked()) args << "code";
+        if (ui->readdata->isChecked() || ui->writedata->isChecked()) args << "data";
+        if (ui->readconfig->isChecked() || ui->writeconfig->isChecked()) args << "config";
+    }
+    if (ui->writecode->isChecked() || ui->writedata->isChecked() || ui->writeconfig->isChecked())
+        reading=false;
 
     if (reading)
-        args+=" -r ";
+        args << "-r";
     else
-        args+=" -w ";
-    args+= ui->filename->text();
+        args << "-w";
+    args << ui->filename->text();
     testfile=new QFileInfo(ui->filename->text());
     if (reading)
     {
@@ -165,17 +228,16 @@ void MainWindow::on_exec_clicked()
     }
     // TODO: Could add write all and do in 3 operations
 
-    ui->exec->setEnabled(false);
-    ui->groupBox->setEnabled(false);
-    ui->device->setEnabled(false);
-    ui->browse->setEnabled(false);
-    ui->useisp->setEnabled(false);
+
+    ui->controls->setEnabled(false);
     slave=new QProcess(this);
     connect(slave,SIGNAL(finished(int)),this,SLOT(on_finished(int)));
-    connect(slave,SIGNAL(readyReadStandardError()),this,SLOT(on_print()));
-    connect(slave,SIGNAL(readyReadStandardOutput()),this,SLOT(on_print()));
-    slave->start(cmd,args);
+    connect(slave, SIGNAL(error(QProcess::ProcessError)), this, SLOT(on_process_error(QProcess::ProcessError)));
+    connect(slave, SIGNAL(readyReadStandardOutput()), this, SLOT(on_process_stdout()));
+    connect(slave, SIGNAL(readyReadStandardError()), this, SLOT(on_process_stderr()));
 
+    qDebug() << "Executing" << cmd << args;
+    slave->start(cmd, args, QProcess::ReadWrite|QProcess::Unbuffered);
 }
 
 void MainWindow::on_action_About_triggered()
@@ -185,31 +247,6 @@ void MainWindow::on_action_About_triggered()
                                                  "This is free software, and you are welcome to redistribute it under certain conditions.\n"
                                                  "See the file COPYING for more information."
                                                  ));
-}
-
-
-// Save file name and device status
-
-
-void MainWindow::on_device_currentIndexChanged(int index)
-{
-    settings->setValue("session/seldevice",ui->device->currentText());
-}
-
-void MainWindow::on_device_currentTextChanged(const QString &arg1)
-{
-    settings->setValue("session/seldevice",ui->device->currentText());
-
-}
-
-void MainWindow::on_filename_textChanged(const QString &arg1)
-{
-    settings->setValue("session/filename",arg1);
-}
-
-void MainWindow::on_useisp_stateChanged(int arg1)
-{
-    settings->setValue("session/isp",ui->useisp->isChecked());
 }
 
 void MainWindow::on_action_Options_triggered()

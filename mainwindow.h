@@ -35,33 +35,30 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
-    QSettings *settings;
-    ~MainWindow();
+    virtual ~MainWindow();
 
 private slots:
     void on_browse_clicked();
 
     void on_exec_clicked();
 
-    void on_finished(int);
-    void on_print();
-
+    void on_process_error(QProcess::ProcessError);
+    void on_finished(int code);
+    void on_process_stdout();
+    void on_process_stderr();
 
     void on_action_About_triggered();
-
-    void on_device_currentIndexChanged(int index);
-
-    void on_device_currentTextChanged(const QString &arg1);
-
-    void on_filename_textChanged(const QString &arg1);
-
-    void on_useisp_stateChanged(int arg1);
 
     void on_action_Options_triggered();
 
     void on_editbtn_clicked();
 
+protected:
+    virtual void closeEvent(QCloseEvent *event);
+
 private:
+    void shellAppend(QString color, QString text);
+
     Ui::MainWindow *ui;
     QProcess *slave;
 };
