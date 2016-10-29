@@ -6,7 +6,10 @@
 
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): {
+    QT += widgets
+    load(qt_parts)
+}
 
 TARGET = qtl866
 TEMPLATE = app
