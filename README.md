@@ -58,12 +58,12 @@ You can also add options there such as: miniprohex --obs 16
 
 Using the same technique, binhexedit is a script that converts
 hex or srec files to binary and calls a binary editor
-(by default bliss) to edit the file and then converts it back
+(by default bless) to edit the file and then converts it back
 on exit. This depends on srec_copy doing the conversion 
 correctly in both directions, so you probably want to save a backup
 unless you are directly editing a .bin file.
 
-Assumes bliss and binhexedit are in your path. You need a -r to read
+Assumes bless and binhexedit are in your path. You need a -r to read
 a file with binhexedit as in:
 
 binhexedit -r test.hex
