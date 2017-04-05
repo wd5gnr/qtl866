@@ -16,7 +16,7 @@ public:
     virtual ~OptDialog();
 
 protected:
-    virtual void closeEvent(QCloseEvent *event);
+    virtual void accept();
 
 private slots:
     void restoreDefaults();

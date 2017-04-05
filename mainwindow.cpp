@@ -159,7 +159,6 @@ void MainWindow::on_exec_clicked()
     if (ui->filename->text().isEmpty()||ui->filename->text().isNull())
     {
         on_browse_clicked();
-        emit ui->exec->clicked(); // avoid stack overflow with patient users
         return;
     }
     // TODO: detect .hex .srec etc and convert to temporary file on write (or could do this in script)

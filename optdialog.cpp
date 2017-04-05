@@ -25,13 +25,13 @@ OptDialog::~OptDialog()
     delete ui;
 }
 
-void OptDialog::closeEvent(QCloseEvent *event)
+void OptDialog::accept()
 {
     QSettings settings;
     settings.setValue("options/command",ui->exec->text());
     settings.setValue("options/editcmd",ui->editor->text());
 
-    QDialog::closeEvent(event);
+    QDialog::accept();
 }
 
 void OptDialog::restoreDefaults()
