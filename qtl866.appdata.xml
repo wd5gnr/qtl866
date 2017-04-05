@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+  <id>qtl866.desktop</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0+</project_license>
+  <name>MiniPRO TL866 Programmer</name>
+  <summary>GUI driver for the TL866 (MiniPRO) chip programmer</summary>
+  <description>
+    <p>
+      Qtl866 provides a GUI for the MiniPRO TL866CS and MiniPRO TL866A
+      programmers. It utilizes the command-line based minipro tool and
+      supports more than 13000 target devices (including AVRs, PICs,
+      various BIOSes and EEPROMs).
+    </p>
+  </description>
+  <keywords>
+    <keyword>TL866</keyword>
+    <keyword>TL866A</keyword>
+    <keyword>TL866CS</keyword>
+    <keyword>MiniPRO</keyword>
+  </keywords>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/wd5gnr/qtl866/master/screenshot.png</image>
+    </screenshot>
+  </screenshots>
+  <url type="homepage">https://github.com/wd5gnr/qtl866</url>
+  <url type="bugtracker">https://github.com/wd5gnr/qtl866/issues</url>
+  <url type="help">https://github.com/wd5gnr/qtl866/wiki</url>
+  <update_contact>lkundrak@v3.sk></update_contact>
+  <provides>
+    <modalias>usb:v04D8pE11Cd0000dc00dsc00dp00ic00isc00ip00in00</modalias>
+  </provides>
+</component>

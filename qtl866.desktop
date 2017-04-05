@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=MiniPRO TL866 Programmer
+GenericName=MiniPRO TL866 Programmer
+Comment=Read and write chips
+Keywords=MiniPRO;TL866;TL866A;TL866CS;programmer;
+Exec=qtl866
+Terminal=false
+StartupNotify=true
+Type=Application
+Icon=qtl866
+Categories=Utility;Qt;
