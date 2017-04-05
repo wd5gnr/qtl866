@@ -257,6 +257,7 @@ void MainWindow::on_action_Options_triggered()
 
 void MainWindow::on_editbtn_clicked()
 {
-    QString cmdline=settings->value("options/editcmd","binhexedit -r").toString() +" " + ui->filename->text();
+    QSettings settings;
+    QString cmdline=settings.value("options/editcmd","binhexedit -r").toString() +" " + ui->filename->text();
     system(cmdline.toLatin1());
 }
