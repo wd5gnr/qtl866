@@ -61,6 +61,7 @@ private:
 
     Ui::MainWindow *ui;
     QProcess *slave;
+    QStringList devices;
 };
 
 #endif // MAINWINDOW_H
