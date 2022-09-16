@@ -45,13 +45,20 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    unsigned int i;
     QString selected;
     QSettings settings;
-    selected=settings.value("session/seldevice","PIC16F886").toString();
+    QString cmd=settings.value("options/command","minipro").toString();
+    selected=settings.value("session/seldevice","PIC16F88").toString();
     ui->setupUi(this);
-    for (i=0;i<sizeof(devnames)/sizeof(devnames[0]);i++)
-        ui->device->addItem(devnames[i],devnames[i]);
+    QProcess proc(this);
+    proc.setReadChannel(QProcess::StandardOutput);
+    proc.start(cmd, QStringList() << "-l");
+    proc.waitForFinished();
+    devices=QString(proc.readAllStandardOutput()).split("\n");
+    if(devices.empty()){
+        QMessageBox::critical(this,tr("Error"),tr("Can't get supported devices from minipro"));
+    }
+    ui->device->addItems(devices);
     ui->device->setCurrentText(selected);
     ui->filename->setText(settings.value("session/filename","").toString());
     ui->useisp->setChecked(settings.value("session/isp",false).toBool());
@@ -163,13 +170,8 @@ void MainWindow::on_exec_clicked()
     }
     // TODO: detect .hex .srec etc and convert to temporary file on write (or could do this in script)
     devname=ui->device->currentText();
-    for (i=0;i<sizeof(devnames)/sizeof(devnames[0]);i++)
-    {
-        if (!strcmp(devname.toStdString().c_str(),devnames[i]))
-        {
-            found=true;
-            break;
-        }
+    if(devices.contains(devname)){
+        found=true;
     }
     if (!found)
     {
